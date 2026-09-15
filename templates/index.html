@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="app">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="3" y="3" width="18" height="18" rx="4" stroke="white" stroke-width="2"/>
+                    </svg>
+                </span>
+                <h1>Task<span>Flow</span></h1>
+            </div>
+
+            <nav class="nav-group">
+                <a href="/" class="nav-item {% if active_filter == 'all' %}active{% endif %}">
+                    <span class="nav-icon">▦</span> Dashboard
+                </a>
+            </nav>
+
+            <p class="nav-label">Tasks</p>
+            <nav class="nav-group">
+                <a href="/" class="nav-item {% if active_filter == 'all' %}active{% endif %}">
+                    <span class="nav-icon">☰</span> All Tasks
+                </a>
+                <a href="/?filter=pending" class="nav-item {% if active_filter == 'pending' %}active{% endif %}">
+                    <span class="nav-icon">◔</span> Pending
+                </a>
+                <a href="/?filter=completed" class="nav-item {% if active_filter == 'completed' %}active{% endif %}">
+                    <span class="nav-icon">✓</span> Completed
+                </a>
+            </nav>
+           
+            <div class="sidebar-card">
+                <div class="sidebar-card-icon">📋</div>
+                <h3>Stay organized</h3>
+                <p>Plan your day and achieve more.</p>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main">
+
+            <header class="topbar">
+                <div>
+                    <h2>Good evening, Aaryan 👋</h2>
+                    <p>Manage your tasks efficiently</p>
+                </div>
+                <div class="topbar-actions">
+                    <button class="icon-btn" aria-label="Notifications">🔔</button>
+                    <a href="/add-task" class="btn-primary">+ Add Task</a>
+                </div>
+            </header>
+
+            <section class="stats">
+                <div class="stat-card stat-total">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-body">
+                        <span class="stat-number">{{ total_tasks }}</span>
+                        <span class="stat-label">Total Tasks</span>
+                        <span class="stat-sub">All tasks in your list</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-pending">
+                    <div class="stat-icon">🕐</div>
+                    <div class="stat-body">
+                        <span class="stat-number">{{ pending_tasks }}</span>
+                        <span class="stat-label">Pending Tasks</span>
+                        <span class="stat-sub">Tasks waiting to be done</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-completed">
+                    <div class="stat-icon">✔</div>
+                    <div class="stat-body">
+                        <span class="stat-number">{{ completed_tasks }}</span>
+                        <span class="stat-label">Completed Tasks</span>
+                        <span class="stat-sub">Tasks you've completed</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="table-panel">
+                <div class="table-toolbar">
+                    <form class="search-box" action="/search" method="GET">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" name="keyword" placeholder="Search tasks...">
+                    </form>
+
+                    <div class="toolbar-right">
+                        <a href="/remove-done" class="link-btn">Remove completed</a>
+
+                        <form class="sort-box" method="GET" action="/">
+                            {% if active_filter and active_filter != 'all' %}
+                            <input type="hidden" name="filter" value="{{ active_filter }}">
+                            {% endif %}
+                            <label for="sort">Sort by:</label>
+                            <select id="sort" name="sort" onchange="this.form.submit()">
+                                <option value="" {% if not sort_by %}selected{% endif %}>Default</option>
+                                <option value="priority" {% if sort_by == 'priority' %}selected{% endif %}>Priority</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Task Name</th>
+                            <th>Priority</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>{{ task.task_id }}</td>
+                            <td class="task-name">{{ task.task_name }}</td>
+                            <td>
+                                <span class="badge badge-{{ task.priority | lower }}">
+                                    ● {{ task.priority }}
+                                </span>
+                            </td>
+                            <td class="due-date">📅 {{ task.due_date }}</td>
+                            <td>
+                                {% if task.status == 'Done' %}
+                                <span class="status status-done">✓ Done</span>
+                                {% else %}
+                                <span class="status status-pending">○ Pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="actions">
+                                <a href="/edit-task/{{ task.task_id }}" class="action-btn edit" aria-label="Edit">✎</a>
+                                {% if task.status != 'Done' %}
+                                <a href="/mark-done/{{ task.task_id }}" class="action-btn done" aria-label="Mark done">✓</a>
+                                {% else %}
+                                <span class="action-btn done disabled" aria-hidden="true">✓</span>
+                                {% endif %}
+                                <a href="/delete-task/{{ task.task_id }}" class="action-btn delete" aria-label="Delete">🗑</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <p class="table-footer">Showing {{ tasks|length }} of {{ total_tasks }} tasks</p>
+            </section>
+
+            <footer class="page-footer">
+                &copy; 2026 TaskFlow. All rights reserved.
+            </footer>
+
+        </main>
+    </div>
+
+</body>
+</html>

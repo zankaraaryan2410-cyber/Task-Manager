@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Task · TaskFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="app">
+
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="3" y="3" width="18" height="18" rx="4" stroke="white" stroke-width="2"/>
+                    </svg>
+                </span>
+                <h1>Task<span>Flow</span></h1>
+            </div>
+
+            <nav class="nav-group">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">▦</span> Dashboard
+                </a>
+            </nav>
+
+            <p class="nav-label">Tasks</p>
+            <nav class="nav-group">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">☰</span> All Tasks
+                </a>
+                <a href="/?filter=pending" class="nav-item">
+                    <span class="nav-icon">◔</span> Pending
+                </a>
+                <a href="/?filter=completed" class="nav-item">
+                    <span class="nav-icon">✓</span> Completed
+                </a>
+            </nav>
+
+            <div class="sidebar-card">
+                <div class="sidebar-card-icon">📋</div>
+                <h3>Stay organized</h3>
+                <p>Plan your day and achieve more.</p>
+            </div>
+        </aside>
+
+        <main class="main">
+
+            <header class="topbar">
+                <div>
+                    <h2>Add a new task</h2>
+                    <p>Fill in the details below</p>
+                </div>
+                <div class="topbar-actions">
+                    <a href="/" class="btn-secondary">Cancel</a>
+                </div>
+            </header>
+
+            <section class="form-panel">
+                <form action="/add-task" method="POST" class="task-form">
+
+                    <div class="form-group">
+                        <label for="task_name">Task name</label>
+                        <input
+                            type="text"
+                            id="task_name"
+                            name="task_name"
+                            placeholder="e.g. Complete DSA assignment"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="priority">Priority</label>
+                            <select id="priority" name="priority" required>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="due_date">Due date</label>
+                            <input
+                                type="date"
+                                id="due_date"
+                                name="due_date"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-block">Add Task</button>
+                </form>
+            </section>
+
+        </main>
+    </div>
+
+</body>
+</html>
